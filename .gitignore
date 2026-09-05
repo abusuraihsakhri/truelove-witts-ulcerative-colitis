@@ -4,3 +4,29 @@ __pycache__/
 .pytest_cache/
 results.csv
 output.csv
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+
+# Build artifacts
+dist/
+build/
+*.egg-info/

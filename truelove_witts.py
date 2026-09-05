@@ -12,6 +12,7 @@ import argparse
 import csv
 import json
 import math
+import os
 import sys
 from typing import Dict, Any, List, Optional
 
@@ -19,12 +20,16 @@ from typing import Dict, Any, List, Optional
 def calculate_metrics(**kwargs) -> Dict[str, Any]:
     """
     Core domain algorithm for truelove-witts-ulcerative-colitis.
+    Classifies severity based on weighted numeric parameters.
     """
     params = {}
     for k, v in kwargs.items():
         if v is not None:
             try:
-                params[k] = float(v)
+                fv = float(v)
+                if math.isnan(fv) or math.isinf(fv):
+                    continue
+                params[k] = fv
             except (ValueError, TypeError):
                 params[k] = str(v)
 
@@ -37,7 +42,7 @@ def calculate_metrics(**kwargs) -> Dict[str, Any]:
         score += nv * (1.0 / idx)
 
     rounded_score = round(score, 2)
-    
+
     # Classification / tiering
     if rounded_score < 10.0:
         tier = "Low / Standard"
@@ -66,10 +71,16 @@ def process_single(args) -> None:
 
 
 def process_batch(input_csv: str, output_csv: str) -> None:
+    if not os.path.isfile(input_csv):
+        raise FileNotFoundError(f"Input CSV file not found: {input_csv}")
+
     with open(input_csv, mode="r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         fieldnames = list(reader.fieldnames or [])
         rows = list(reader)
+
+    if not fieldnames:
+        raise ValueError(f"Input CSV file is empty or has no headers: {input_csv}")
 
     out_fields = fieldnames + ["score", "classification", "clinical_recommendation"]
     out_rows = []
