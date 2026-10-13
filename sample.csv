@@ -1,4 +1,4 @@
-Patient_ID,v1,v2,v3
-PT-101,14.5,4.2,1.8
-PT-102,8.0,2.1,0.5
-PT-103,28.4,12.0,5.5
+case_id,stools_per_day,blood,pulse_bpm,temperature_c,hemoglobin_g_dl,esr_mm_h,crp_mg_l
+CASE-001,3,small,75,37.0,13.5,10,2
+CASE-002,5,visible,85,37.2,11.5,20,15
+CASE-003,8,visible,110,38.2,9.8,50,65
