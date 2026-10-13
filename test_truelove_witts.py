@@ -1,21 +1,9 @@
-import pytest
-from truelove_witts import calculate_metrics, process_batch
+"""Smoke tests for the clinical assessment public entry points."""
+from truelove_witts import assess_truelove_witts, calculate_metrics
 
 
 def test_truelove_witts_single():
-    res = calculate_metrics(v1=12.0, v2=4.0)
-    assert "score" in res
-    assert "classification" in res
-    assert res["score"] > 0
-
-
-def test_truelove_witts_batch(tmp_path):
-    csv_in = tmp_path / "in.csv"
-    csv_out = tmp_path / "out.csv"
-    csv_in.write_text("Patient,v1,v2\nPat_001,15.0,3.0\nPat_002,5.0,1.0\n", encoding="utf-8")
-    
-    process_batch(str(csv_in), str(csv_out))
-    assert csv_out.exists()
-    content = csv_out.read_text(encoding="utf-8")
-    assert "Pat_001" in content
-    assert "score" in content
+    values = dict(stools_per_day=6, blood="visible", pulse_bpm=100,
+                  temperature_c=37.0, hemoglobin_g_dl=12.0)
+    assert assess_truelove_witts(**values)["classification"] == "Severe"
+    assert calculate_metrics(**values)["acute_severe_criteria_met"] is True

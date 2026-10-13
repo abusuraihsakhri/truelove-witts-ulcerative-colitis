@@ -1,170 +1,80 @@
-# Truelove Witts Ulcerative Colitis
+# Truelove–Witts ulcerative colitis severity calculator
 
-> **Domain:** Gastroenterology, Hepatology & Clinical Nutrition
-> **Reference Guidelines & Standards:** `AASLD & ACG Clinical Practice Guidelines`
+An adult ulcerative colitis severity assessment based on the modified Truelove and Witts criteria. The repository includes a zero-dependency Python CLI and a static, client-side browser calculator in [web/](web/).
 
-<div align="center">
+**Clinical use:** Educational decision support only. This is not a diagnosis or treatment protocol. Suspected acute severe ulcerative colitis (ASUC) is a medical emergency warranting urgent hospital assessment.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+## How the classification works
 
-</div>
+**Severe** requires **at least six stools/day with visible blood**, and **at least one** systemic toxicity marker:
 
----
+- Pulse >90 beats/minute
+- Temperature >37.8°C
+- Haemoglobin <10.5 g/dL
+- ESR >30 mm/hour
+- CRP >30 mg/L (modified criterion)
 
-## 📖 What It Does
+**Mild** is fewer than four stools/day with none/small amounts of blood and normal-range values on the assessed mild-severity variables (pulse <90, temperature <37.5°C, haemoglobin >11.5 g/dL, ESR <20 when measured, CRP ≤5 mg/L when measured). The CRP mild-range cutoff of 5 mg/L is a pragmatic assumption; reference ranges vary across laboratories. **Moderate** comprises cases not meeting mild or severe patterns.
 
-Truelove and Witts Severity Criteria for Ulcerative Colitis
-Classifies acute severe ulcerative colitis flares into Mild, Moderate, or Severe.
+For **six or more visibly bloody stools/day**, the absence of a positive systemic marker cannot rule out ASUC when ESR or CRP is missing. Such cases are labeled **Indeterminate**, not negative. A positive marker establishes severe classification even if other markers are unavailable.
 
-Zero-dependency Python implementation with single and batch evaluation.
-Author: Dr. Abu Suraih Sakhri
-License: MIT
+Threshold comparisons follow the cited criteria strictly (e.g. 90 bpm is not >90 bpm). This is a categorical rule set, **not a numerical severity score**. Results are not validated to predict outcomes.
 
----
+Sources: [NICE NG130: UC management, Truelove and Witts severity index](https://www.nice.org.uk/guidance/ng130/chapter/Recommendations) and [BSG inflammatory bowel disease guidelines, 2025](https://doi.org/10.1136/gutjnl-2024-334395).
 
-## ⚙️ Key Capabilities & Algorithmic Modules
+## Browser calculator
 
-### 🔬 Analytical Functions
+The complete static app is in [web/index.html](web/index.html). It runs using native JavaScript, with no dependencies or server-side Python. Start a local static server to test:
 
-- **`calculate_metrics()`**: Core domain algorithm that computes a weighted score from input parameters and classifies severity.
-- **`process_single()`** — Evaluates a single case with provided parameters.
-- **`process_batch()`** — Processes CSV files with multiple records.
-- **`main()`** — CLI entry point for single and batch operations.
+~~~bash
+python -m http.server 8000 --directory web
+~~~
 
-### 🏗️ Architecture
+Open http://localhost:8000. The form has no patient identifiers, analytics, cookies, remote script calls, or persistence; submitted observations remain in browser memory only. Deployment to GitHub Pages is configured by [the Pages workflow](.github/workflows/pages.yml), subject to Pages being enabled for the repository.
 
-| Module | Description |
-|:-------|:------------|
-| `truelove_witts.py` | Core algorithm (zero-dependency) |
-| `cli.py` | Enterprise CLI with audit, chat, batch, and serve commands |
-| `agents/` | Multi-agent supervisor, workers, PHI guard, and audit trail |
-| `enrichment.py` | Enrichment engines for longitudinal tracking, EHR/FHIR, dashboards, etc. |
-| `simulator.py` | High-throughput stress testing simulator |
-| `web/index.html` | Operations console dashboard |
+## Python CLI
 
----
+Python 3.10+ is supported, without runtime dependencies for the calculator.
 
-## 📐 Algorithm
+~~~bash
+python truelove_witts.py single --stools-per-day 8 --blood visible \
+  --pulse-bpm 105 --temperature-c 38.1 --hemoglobin-g-dl 10.0 \
+  --esr-mm-h 45 --crp-mg-l 55
 
-The scoring algorithm computes a weighted sum of numeric inputs:
-
-```text
-score = primary_val + Σ(secondary_val_i * (1.0 / i))  for i = 2..n
-```
-
-Classification tiers:
-- **Low / Standard** (score < 10.0): Standard monitoring
-- **Moderate / Intermediate** (10.0 ≤ score < 25.0): Close observation
-- **High / Severe** (score ≥ 25.0): Urgent clinical intervention
-
----
-
-## 💻 CLI Quickstart & Usage
-
-### 1. Single Case Evaluation
-```bash
-python truelove_witts.py single --v1 14.5 --v2 4.2 --v3 1.8
-```
-
-### 2. Batch CSV Processing
-```bash
 python truelove_witts.py batch -i sample.csv -o results.csv
-```
+~~~
 
-### 3. Enterprise CLI (requires fastapi, uvicorn, pydantic)
-```bash
-# Audit a single task
-python cli.py audit --task-id TASK-001 --primary 28.5 --secondary 14.2
+For CSV input, headers **stools_per_day, blood, pulse_bpm, temperature_c, hemoglobin_g_dl** are required; **esr_mm_h, crp_mg_l** are optional. Blood values: **none**, **small**, or **visible**. The example file [sample.csv](sample.csv) uses deidentified cases. Invalid observations cause explicit errors rather than fallback scores. Batch processing does not transmit records and escapes spreadsheet-formula-leading cells in exports.
 
-# Batch process
-python cli.py batch -i sample.csv -o results.csv
+The Python functions are **assess_truelove_witts(...)**, **calculate_metrics(...)** (compatibility name), and **process_batch(...)**.
 
-# Verify audit trail integrity
-python cli.py verify-audit
+## Optional API and legacy modules
 
-# Launch REST API server
-python cli.py serve --host 127.0.0.1 --port 8000
-```
+The FastAPI service provides **POST /api/severity** for the clinical assessment, and **GET /health**. Install dependencies and run it locally:
 
-### Input Data Schema
+~~~bash
+python -m pip install fastapi uvicorn pydantic
+python cli.py serve
+~~~
 
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `Patient_ID` | Patient identifier | Required |
-| `v1` | Primary measurement | Required |
-| `v2` | Secondary measurement | Required |
-| `v3` | Tertiary measurement | Optional |
+The separate **cli.py audit/chat/batch**, **agents/**, **enrichment.py**, and **simulator.py** preserve older generic demonstration workflows. These are **not implementations or clinical validation of Truelove–Witts**. The demo chat uses mock responses; it does not provide real clinical reasoning. The optional audit process records metadata in memory, not a durable certified clinical audit. Regex-based identifier detection is incomplete and **must not be treated as guaranteed deidentification**. Do not submit real patient identifiers to the demo endpoints. Set **AUDIT_SECRET_KEY** before using the optional audit service where tamper detection must persist across restarts.
 
----
+The Dockerfile and Compose file run the optional API service and are not required for the browser calculator.
 
-## 🛡️ Security & Enterprise Architecture
+## Tests
 
-* **Zero-PHI Outbound Interceptor:** Active regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
+~~~bash
+python -m pip install pytest fastapi uvicorn pydantic
+python -m pytest -q
+node --test web/criteria.test.mjs
+~~~
 
-### Security Configuration
+GitHub Actions also compiles Python, tests Python 3.10–3.12, verifies browser rules, and builds the Docker image.
 
-Set the `AUDIT_SECRET_KEY` environment variable for production deployments:
+## Compatibility and privacy
 
-```bash
-# Linux/macOS
-export AUDIT_SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+The browser app uses native ECMAScript modules and works in current Chrome, Firefox, Safari, and Edge versions that support them; no Pyodide is loaded. Browser output is calculated locally and is not sent to a backend. The optional API processes submitted data server-side and should not be exposed to the public internet without authentication and deployment security controls.
 
-# Windows PowerShell
-$env:AUDIT_SECRET_KEY = -join ((1..32 | ForEach-Object { Get-Random -Max 16 }).ForEach({ "{0:x}" -f $_ }))
-```
+## License
 
----
-
-## 🧪 Testing & Verification
-
-Install test dependencies:
-
-```bash
-pip install pytest fastapi uvicorn pydantic
-```
-
-Run the automated test suite:
-
-```bash
-pytest -v
-```
-
-Execute high-throughput batch simulation benchmarks:
-
-```bash
-python simulator.py 1000
-```
-
----
-
-## 🐳 Container Deployment
-
-Build and run with Docker:
-
-```bash
-docker build -t truelove-witts-ulcerative-colitis .
-docker run -p 8000:8000 -e AUDIT_SECRET_KEY=your-secret-key truelove-witts-ulcerative-colitis
-```
-
-Or use Docker Compose:
-
-```bash
-# Create a .env file with your secret
-echo "AUDIT_SECRET_KEY=your-secret-key" > .env
-docker-compose up -d
-```
-
----
-
-## 📄 License
-
-MIT License. See [LICENSE](LICENSE) for details.
+[MIT](LICENSE).

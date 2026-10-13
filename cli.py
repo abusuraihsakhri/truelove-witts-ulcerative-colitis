@@ -12,6 +12,19 @@ from agents.base import AuditLogger
 supervisor = SystemSupervisor(model_provider="mock")
 
 
+def parse_boolean(value):
+    """Interpret explicit CSV booleans without treating 'false' as true."""
+    if isinstance(value, bool):
+        return value
+    normalized = str(value).strip().lower()
+    if normalized in ("1", "true", "yes", "y"):
+        return True
+    if normalized in ("0", "false", "no", "n", ""):
+        return False
+    raise ValueError("is_critical_flag must be true or false")
+
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="truelove-witts-ulcerative-colitis", description="Truelove Witts Ulcerative Colitis")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -98,7 +111,7 @@ def main(argv=None):
                 primary_metric=float(r.get("primary_metric", 15.0)),
                 secondary_metric=float(r.get("secondary_metric", 5.0)),
                 status_descriptor=r.get("status_descriptor", "NOMINAL"),
-                is_critical_flag=bool(r.get("is_critical_flag", False)),
+                is_critical_flag=parse_boolean(r.get("is_critical_flag", False)),
             )
             dossier = supervisor.process_task(payload)
             row_dict = dict(r)

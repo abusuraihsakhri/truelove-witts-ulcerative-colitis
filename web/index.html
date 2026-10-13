@@ -1,236 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Truelove Witts Ulcerative Colitis — Operations Console</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #090d16;
-            --card: #111827;
-            --border: #1f293d;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.25);
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
-        .header-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--accent-glow);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .card h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.65rem 0.9rem;
-            background: #0d1322;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1.4rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn:hover { background: #2563eb; }
-        .terminal {
-            background: #060911;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #10b981;
-            height: 380px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        .metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .metric-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .metric-val { font-size: 1.4rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
-        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Adult ulcerative colitis severity assessment using modified Truelove and Witts criteria. Runs locally in your browser.">
+  <title>Truelove–Witts | Ulcerative colitis severity</title>
+  <style>
+    :root { color-scheme: light; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; --ink:#192a40; --muted:#52637a; --accent:#155e75; --surface:#fff; --bg:#f3f6fa; --border:#ced8e2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color:var(--ink); background:var(--bg); }
+    main { max-width: 950px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+    h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); margin:0; letter-spacing:-.025em; }
+    h2 { font-size:1.15rem; margin:0 0 1rem; }
+    p { margin:.5rem 0 1rem; } .lead { color:var(--muted); max-width:68ch; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-top:1.3rem; box-shadow:0 2px 14px #23384e0b; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem 1.3rem; }
+    label { display:block; font-weight:600; margin-bottom:.3rem; }
+    .hint { display:block; font-size:.81rem; color:var(--muted); margin-top:.3rem; }
+    input, select { width:100%; border:1px solid #8fa1b4; border-radius:7px; background:#fff; color:var(--ink); padding:.65rem; font:inherit; min-height:44px; }
+    input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline:3px solid #26849b; outline-offset:2px; }
+    button { border:0; background:var(--accent); color:#fff; padding:.7rem 1.4rem; min-height:44px; border-radius:7px; font:inherit; font-weight:700; cursor:pointer; }
+    button:hover { background:#114d60; } button.secondary { background:#e5eef2; color:var(--ink); margin-left:.5rem; }
+    .actions { margin-top:1.4rem; }
+    #result[hidden] { display:none; } #result { border-left:5px solid var(--accent); }
+    #result.severe { border-left-color:#b91c1c; } #result.indeterminate { border-left-color:#b45309; }
+    .classification { font-size:1.5rem; font-weight:750; margin:.2rem 0; }
+    #markers { padding-left:1.2rem; }
+    .notice { border-left:4px solid #b45309; padding:.8rem 1rem; background:#fff7ed; margin-top:1.4rem; }
+    footer { margin-top:1.6rem; color:var(--muted); font-size:.88rem; }
+    a { color:#0c627a; } .error { color:#9d1520; font-weight:700; }
+    @media (max-width:620px) { .form-grid { grid-template-columns:1fr; } main { padding-top:1.5rem; } .card { padding:1rem; } .actions button { margin:.25rem .4rem .25rem 0; } }
+  </style>
 </head>
 <body>
-
-    <div class="header">
-        <div class="header-title">
-            <h1>Truelove Witts Ulcerative Colitis</h1>
-            <p>Domain: Clinical & Cryptographic AI | Standard: CAP / CLSI / NIST Standards | LabMind-Atlas Architecture</p>
-        </div>
-        <div>
-            <span class="badge">Air-Gapped Active</span>
-            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Zero-PHI Guard Active</span>
-        </div>
-    </div>
-
-    <div class="metrics-bar">
-        <div class="metric-box">
-            <div class="metric-label">System Status</div>
-            <div class="metric-val" style="color: var(--success);" id="m-status">OPTIMAL</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Tasks Processed</div>
-            <div class="metric-val" id="m-tasks">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Audit Blocks Signed</div>
-            <div class="metric-val" id="m-audit">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">PHI Interceptions</div>
-            <div class="metric-val" style="color: var(--accent);" id="m-phi">0</div>
-        </div>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <h2>⚙️ Dispatch Distributed Component Audit</h2>
-            <div class="form-group">
-                <label>Task / Sample ID</label>
-                <input type="text" id="task_id" value="TASK-2026-LIVE-01">
-            </div>
-            <div class="form-group">
-                <label>Target Identifier</label>
-                <input type="text" id="target_id" value="SPECIMEN-ALPHA-77">
-            </div>
-            <div class="form-group">
-                <label>Primary Measurement / Value</label>
-                <input type="number" id="primary_metric" value="29.4" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Secondary Metric / Kinetic Index</label>
-                <input type="number" id="secondary_metric" value="14.8" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Status / Phenotype Descriptor</label>
-                <input type="text" id="status_descriptor" value="DISCORDANT_ANOMALY">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="is_critical" checked> Trigger Emergency / Critical Flag</label>
-            </div>
-            <button class="btn" onclick="runAudit()">Execute Distributed Component Audit</button>
-        </div>
-
-        <div class="card">
-            <h2>📊 Real-Time Consensus Dossier & Audit Log</h2>
-            <div class="terminal" id="outputConsole">// Truelove Witts Ulcerative Colitis Operations Console Ready
-// Connection established with Air-Gapped Supervisor
-// Cryptographic HMAC-SHA256 audit ledger loaded.
-// Ready for live task payload dispatch...</div>
-        </div>
-    </div>
-
-    <script>
-        async function runAudit() {
-            const consoleEl = document.getElementById('outputConsole');
-            consoleEl.innerText = "// Dispatching task across specialized workers...
-// Invoking InvariantQCWorker, SafetyEscalationWorker, ProtocolWorker...";
-
-            const payload = {
-                task_id: document.getElementById('task_id').value,
-                target_identifier: document.getElementById('target_id').value,
-                primary_metric: parseFloat(document.getElementById('primary_metric').value),
-                secondary_metric: parseFloat(document.getElementById('secondary_metric').value),
-                status_descriptor: document.getElementById('status_descriptor').value,
-                is_critical_flag: document.getElementById('is_critical').checked
-            };
-
-            try {
-                const res = await fetch('/api/audit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                consoleEl.innerText = JSON.stringify(data, null, 2);
-                document.getElementById('m-tasks').innerText = parseInt(document.getElementById('m-tasks').innerText) + 1;
-                document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
-            } catch (err) {
-                consoleEl.innerText = "// Offline / Simulation Output:\n" + JSON.stringify({
-                    dossier_id: "DOSSIER-SIM-" + Math.floor(Math.random()*10000),
-                    system: "truelove-witts-ulcerative-colitis",
-                    domain: "Clinical & Cryptographic AI",
-                    task_id: payload.task_id,
-                    overall_urgency: payload.is_critical_flag ? "CRITICAL_STAT_PANIC" : "ELEVATED_RISK",
-                    integrity_status: "DISCORDANT_ANOMALY",
-                    alerts: [
-                        { worker: "InvariantQCWorker", alert: "Primary metric exceeds upper reference bound" },
-                        { worker: "SafetyEscalationWorker", alert: "Critical emergency interlock flag active" }
-                    ],
-                    audit_hash: "HMAC_SHA256_e83f9a72b941d6c381f9"
-                }, null, 2);
-            }
-        }
-    </script>
+<main>
+  <header>
+    <h1>Truelove–Witts UC severity assessment</h1>
+    <p class="lead">Rule-based adult ulcerative colitis severity classification. Enter observations; calculations run entirely in this browser. No patient identifiers or records are needed.</p>
+  </header>
+  <div class="notice"><strong>Clinical caution:</strong> This educational aid is not a diagnosis or treatment plan. Suspected acute severe UC requires urgent hospital assessment. Incomplete investigations may limit classification.</div>
+  <section class="card" aria-labelledby="entry-title">
+    <h2 id="entry-title">Clinical observations</h2>
+    <form id="assessment">
+      <div class="form-grid">
+        <div><label for="stools">Stools per day</label><input id="stools" name="stools_per_day" type="number" min="0" step="1" required placeholder="e.g. 6"><span class="hint">Total daily bowel movements</span></div>
+        <div><label for="blood">Blood in stool</label><select id="blood" name="blood" required><option value="">Select…</option><option value="none">None</option><option value="small">Small amounts</option><option value="visible">Visible blood</option></select><span class="hint">Visible blood is required for the severe criterion</span></div>
+        <div><label for="pulse">Pulse (beats/min)</label><input id="pulse" name="pulse_bpm" type="number" min="0" step="any" required placeholder="e.g. 92"><span class="hint">Severe systemic marker: &gt;90</span></div>
+        <div><label for="temp">Temperature (°C)</label><input id="temp" name="temperature_c" type="number" min="0" step="any" required placeholder="e.g. 38.0"><span class="hint">Severe systemic marker: &gt;37.8°C</span></div>
+        <div><label for="hb">Haemoglobin (g/dL)</label><input id="hb" name="hemoglobin_g_dl" type="number" min="0" step="any" required placeholder="e.g. 10.2"><span class="hint">Severe systemic marker: &lt;10.5 g/dL</span></div>
+        <div><label for="esr">ESR (mm/hour, optional)</label><input id="esr" name="esr_mm_h" type="number" min="0" step="any" placeholder="e.g. 45"><span class="hint">Severe systemic marker: &gt;30 mm/hour</span></div>
+        <div><label for="crp">CRP (mg/L, optional)</label><input id="crp" name="crp_mg_l" type="number" min="0" step="any" placeholder="e.g. 40"><span class="hint">Modified criterion: &gt;30 mg/L</span></div>
+      </div>
+      <div class="actions"><button type="submit">Assess severity</button><button class="secondary" type="reset">Clear inputs</button></div>
+    </form>
+    <p id="form-error" class="error" role="alert" hidden></p>
+  </section>
+  <section id="result" class="card" aria-live="polite" aria-labelledby="result-title" hidden>
+    <h2 id="result-title">Assessment</h2>
+    <p class="classification" id="category"></p>
+    <p id="advice"></p>
+    <div id="marker-block"><strong>Systemic toxicity markers</strong><ul id="markers"></ul></div>
+    <p id="missing"></p>
+  </section>
+  <section class="card" aria-labelledby="criteria-title">
+    <h2 id="criteria-title">Interpretation</h2>
+    <p><strong>Severe:</strong> At least six stools/day with visible blood, plus any one of pulse &gt;90/min, temperature &gt;37.8°C, haemoglobin &lt;10.5 g/dL, ESR &gt;30 mm/hour or CRP &gt;30 mg/L. <strong>Mild:</strong> Fewer than four stools/day, none/small blood, and no abnormality in the assessed mild-range markers. <strong>Moderate:</strong> Between the mild and severe patterns.</p>
+    <p><strong>Indeterminate:</strong> Six or more visibly bloody stools with negative measured toxicity markers but missing ESR or CRP. Missing values are never treated as negative tests.</p>
+    <p>References: <a href="https://www.nice.org.uk/guidance/ng130/chapter/Recommendations" rel="noopener noreferrer">NICE NG130</a> and <a href="https://doi.org/10.1136/gutjnl-2024-334395" rel="noopener noreferrer">BSG guidelines (2025)</a>.</p>
+  </section>
+  <footer>Privacy: form values stay on your device, are not stored, and are not sent to a server. No account, analytics, or external scripts required. Adults only; paediatric severity uses other indices.</footer>
+</main>
+<script type="module">
+  import { assess } from './criteria.mjs';
+  const form = document.getElementById('assessment');
+  const result = document.getElementById('result');
+  const error = document.getElementById('form-error');
+  const names = {
+    pulse_over_90: 'Pulse >90/min',
+    temperature_over_37_8: 'Temperature >37.8°C',
+    hemoglobin_below_10_5: 'Haemoglobin <10.5 g/dL',
+    esr_over_30: 'ESR >30 mm/hour',
+    crp_over_30: 'CRP >30 mg/L'
+  };
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    error.hidden = true;
+    result.hidden = true;
+    try {
+      const values = Object.fromEntries(new FormData(form));
+      const report = assess(values);
+      result.className = 'card ' + report.classification.toLowerCase();
+      document.getElementById('category').textContent = report.classification;
+      document.getElementById('advice').textContent = report.clinical_recommendation;
+      const list = document.getElementById('markers');
+      list.replaceChildren();
+      for (const [key, value] of Object.entries(report.systemic_toxicity)) {
+        const li = document.createElement('li');
+        li.textContent = names[key] + ': ' + (value === null ? 'Not measured' : value ? 'Present' : 'Absent');
+        list.append(li);
+      }
+      const missing = document.getElementById('missing');
+      missing.textContent = report.missing_markers.length ? 'Not measured: ' +
+        report.missing_markers.map(key => names[key]).join(', ') + '.' : '';
+      result.hidden = false;
+      result.scrollIntoView({block:'nearest', behavior:'smooth'});
+    } catch (e) {
+      error.textContent = e.message;
+      error.hidden = false;
+    }
+  });
+  form.addEventListener('reset', () => {
+    error.hidden = true;
+    result.hidden = true;
+  });
+</script>
 </body>
 </html>
